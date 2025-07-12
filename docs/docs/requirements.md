@@ -1,4 +1,4 @@
-# Flux file sharing platform - Design Doc
+# Flux file sharing platform - Requirements
 
 ## Functional Requirements
 
@@ -25,7 +25,6 @@
 3. Users should be able to filter files by type/labels.
 4. Users should be able to perform full text search for text documents and images.
 
-
 ## Non-Functional Requirements
 
 1. The system should be highly available (prioritizing availability over consistency).
@@ -34,8 +33,3 @@
 4. The system should have a storage limit per user.
 5. The system should support file versioning.
 6. The system should scan files for viruses and malware.
-
-## Core Entities
-1. File: raw data that users will be uploading, downloading and sharing.
-2. FileMetadata: metadata associated with the file. It will include information like the file's name, size, MIME type and the user who uploaded it.\
-3. User: the user of our system.
