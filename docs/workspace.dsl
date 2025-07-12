@@ -10,12 +10,11 @@ workspace "Flux" "Flux file sharing platform" {
             wa = container "Web Application" {
                 technology "TypeScript and React"
             }
+            ag = container "API Gateway" {
+                description "Handles authentication, routing and rate limiting"
+            }
             as = container "API Service" {
                 technology "Spring Boot"
-                auth = component "Auth Controller" {
-                    technology "Spring MVC Rest Controller + OAuth2"
-                    description "Generates OAuth2 Access Tokens."
-                }
                 file = component "File Controller" {
                     technology "Spring MVC Rest Controller"
                     description "Allows users to add, remove and share files."
@@ -29,23 +28,31 @@ workspace "Flux" "Flux file sharing platform" {
                     description "Allows users to search for files."
                 }
             }
-            db = container "Database" {
+            dn = container "NoSQL Database" {
                 technology "MongoDB"
+                tags "Database"
+            }
+            db = container "Blob Storage" {
+                technology "Google Cloud Storage"
+                tags "Database"
+            }
+            cdn = container "CDN" {
                 tags "Database"
             }
         }
 
         u -> ss.wa "Views, uploads, downloads and shares files using"
 
-        ss.wa -> ss.as.file "Makes API calls to" "JSON/HTTPS"
-        ss.wa -> ss.as.account "Makes API calls to" "JSON/HTTPS"
-        ss.wa -> ss.as.search "Makes API calls to" "JSON/HTTPS"
+        ss.wa -> ss.ag "Makes API calls to" "JSON/HTTPS"
+        ss.wa -> ss.db "Uploads, downloads files" 
+        ss.wa -> ss.cdn "Downloads frequently accessed files"
 
-        ss.as.file -> ss.as.auth "Requests Access Token"
-        ss.as.account -> ss.as.auth "Requests Access Token"
-        ss.as.search -> ss.as.auth "Requests Access Token"
+        ss.ag -> ss.as.file "Routes API calls to" "JSON/HTTPS"
+        ss.ag -> ss.as.account "Routes API calls to" "JSON/HTTPS"
+        ss.ag -> ss.as.search "Routes API calls to" "JSON/HTTPS"
 
-        ss.as -> ss.db "Reads from and writes to" "SQL/TLS"
+        ss.as -> ss.dn "Reads from and writes to" "SQL/TLS"
+        ss.db -> ss.as.file "Notifies that the file has been uploaded"
     }
 
     views {
