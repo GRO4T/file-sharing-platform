@@ -14,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/files")
+@CrossOrigin(origins = "http://localhost:5173")
 @AllArgsConstructor
 public class FileController {
     @Autowired
