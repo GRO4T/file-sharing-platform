@@ -11,6 +11,5 @@ public interface FileMapper {
     FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
     @Mapping(source = "mimeType", target = "type")
-    @Mapping(source = "url", target = "downloadUrl")
     FileDto fileMetadataToFileDto(FileMetadata fileMetadata);
 }

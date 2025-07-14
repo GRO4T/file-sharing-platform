@@ -9,5 +9,5 @@ public class FileDto {
     private String name;
     private int size;
     private String type;
-    private String downloadUrl;
+    private String uploadedBy;
 }

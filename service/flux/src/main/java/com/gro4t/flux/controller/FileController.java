@@ -1,14 +1,14 @@
 package com.gro4t.flux.controller;
 
 import com.gro4t.flux.dto.FileDto;
+import com.gro4t.flux.dto.FileUploadRequest;
+import com.gro4t.flux.dto.FileUploadResponse;
 import com.gro4t.flux.service.FileService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,4 +26,18 @@ public class FileController {
                 .body(fileService.getFiles());
     }
 
+    @PostMapping
+    public ResponseEntity<FileUploadResponse> uploadFile(@RequestBody FileUploadRequest fileUploadRequest) {
+        var response = fileService.uploadFile(fileUploadRequest.getName());
+
+        if (response.getErrorMessage() != null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(response);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(response);
+    }
 }
