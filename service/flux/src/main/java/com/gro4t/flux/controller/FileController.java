@@ -33,7 +33,7 @@ public class FileController {
 
         if (response.getErrorMessage() != null) {
             return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
+                    .status(HttpStatus.BAD_REQUEST)
                     .body(response);
         }
 
