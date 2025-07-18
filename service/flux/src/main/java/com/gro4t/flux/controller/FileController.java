@@ -38,7 +38,7 @@ public class FileController {
         }
 
         return ResponseEntity
-                .status(HttpStatus.OK)
+                .status(HttpStatus.CREATED)
                 .body(response);
     }
 }
