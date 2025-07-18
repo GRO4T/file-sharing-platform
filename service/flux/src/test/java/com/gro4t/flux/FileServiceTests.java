@@ -1,7 +1,6 @@
 package com.gro4t.flux;
 
 import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
 import com.gro4t.flux.dto.FileDto;
 import com.gro4t.flux.dto.FileUploadResponse;
@@ -16,14 +15,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.net.URL;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest

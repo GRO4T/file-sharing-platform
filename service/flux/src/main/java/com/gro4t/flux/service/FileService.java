@@ -13,6 +13,7 @@ import com.gro4t.flux.repository.FileMetadataRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -37,8 +38,7 @@ public class FileService {
                 .toList();
     }
 
-    // TODO: Make this transactional
-    // * Add @Transactional
+    @Transactional
     public FileUploadResponse uploadFile(String name) {
         var fileMetadataList = fileMetadataRepository.findByName(name);
         if (!fileMetadataList.isEmpty()) {
@@ -51,8 +51,9 @@ public class FileService {
                 .build();
         fileMetadataRepository.save(newFileMetadata);
 
-        var url = generateSignedUploadUrl(name);
-        return FileUploadResponse.builder().uploadUrl(url).build();
+        throw new RuntimeException("JFLJDS");
+//        var url = generateSignedUploadUrl(name);
+//        return FileUploadResponse.builder().uploadUrl(url).build();
     }
 
     String generateSignedUploadUrl(String name) {
