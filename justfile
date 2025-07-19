@@ -1,3 +1,6 @@
+default:
+    just --list
+
 docs:
     docker run -it --rm -p 8081:8080 -v $PWD/docs:/usr/local/structurizr structurizr/lite
 

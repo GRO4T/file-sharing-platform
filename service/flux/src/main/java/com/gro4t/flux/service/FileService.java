@@ -11,7 +11,10 @@ import com.gro4t.flux.mapper.FileMapper;
 import com.gro4t.flux.model.FileMetadata;
 import com.gro4t.flux.repository.FileMetadataRepository;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.net.URL;
@@ -22,13 +25,18 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class FileService {
     @Autowired
-    private final FileMetadataRepository fileMetadataRepository;
+    private FileMetadataRepository fileMetadataRepository;
     @Autowired
-    private final FileMapper fileMapper;
+    private FileMapper fileMapper;
     @Autowired
     private Storage blobStorage;
+
+    @Value("${flux.blob_storage.bucket}")
+    private String bucketName;
 
     public List<FileDto> getFiles() {
         return fileMetadataRepository.findAll()
@@ -39,24 +47,24 @@ public class FileService {
 
     // TODO: Make this transactional
     // * Add @Transactional
-    public FileUploadResponse uploadFile(String name) {
-        var fileMetadataList = fileMetadataRepository.findByName(name);
+    public FileUploadResponse uploadFile(String objectName) {
+        var fileMetadataList = fileMetadataRepository.findByName(objectName);
         if (!fileMetadataList.isEmpty()) {
             return FileUploadResponse.builder().errorMessage("File already exists").build();
         }
 
         var newFileMetadata = FileMetadata.builder()
-                .name(name)
+                .name(objectName)
                 .status(FileStatus.UPLOADING)
                 .build();
         fileMetadataRepository.save(newFileMetadata);
 
-        var url = generateSignedUploadUrl(name);
+        var url = generateSignedUploadUrl(objectName);
         return FileUploadResponse.builder().uploadUrl(url).build();
     }
 
-    String generateSignedUploadUrl(String name) {
-        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of("flux-test-123808", name)).build();
+    String generateSignedUploadUrl(String objectName) {
+        BlobInfo blobInfo = BlobInfo.newBuilder(BlobId.of(bucketName, objectName)).build();
         Map<String, String> extensionHeaders = new HashMap<>();
         extensionHeaders.put("Content-Type", "application/octet-stream");
         URL url =
