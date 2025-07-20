@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -15,17 +15,19 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileMetadata {
-    @Id
-    private String id;
-
+    @Indexed(unique = true)
     @NotBlank(message = "Name cannot be blank")
-    // TODO: Create custom unique validator
     private String name;
     @PositiveOrZero(message = "Size cannot be negative")
     private int size;
     // TODO: Create custom validator
     private String mimeType;
     private String uploadedBy;
-    private FileStatus status;
+    private Status status;
+
+    public enum Status {
+        UPLOADING,
+        UPLOADED
+    }
 }
 

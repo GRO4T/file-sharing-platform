@@ -1,11 +1,7 @@
 package com.gro4t.flux;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gro4t.flux.files.FileController;
-import com.gro4t.flux.files.FileDto;
-import com.gro4t.flux.files.FileUploadRequest;
-import com.gro4t.flux.files.FileUploadResponse;
-import com.gro4t.flux.files.FileService;
+import com.gro4t.flux.files.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -69,7 +65,8 @@ class FileControllerTests {
         FileUploadRequest request = new FileUploadRequest("document.pdf");
         String requestSerialized = objectMapper.writeValueAsString(request);
 
-        when(service.uploadFile("document.pdf")).thenReturn(FileUploadResponse.builder().errorMessage("File already exists").build());
+        when(service.uploadFile("document.pdf")).thenReturn(FileUploadResponse.builder().errorMessage("File already " +
+                "exists").build());
 
         this.mockMvc.perform(
                         post("/files")

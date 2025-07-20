@@ -1,6 +1,5 @@
 package com.gro4t.flux.files;
 
-import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +10,13 @@ import java.util.List;
 @RestController
 @RequestMapping("/files")
 @CrossOrigin(origins = "http://localhost:5173")
-@AllArgsConstructor
 public class FileController {
-    @Autowired
     private final FileService fileService;
+
+    @Autowired
+    public FileController(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @GetMapping
     public ResponseEntity<List<FileDto>> getFiles() {
