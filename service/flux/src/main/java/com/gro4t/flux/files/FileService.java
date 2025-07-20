@@ -37,8 +37,6 @@ public class FileService {
         return fileMetadataRepository.findAll().stream().map(fileMapper::fileMetadataToFileDto).toList();
     }
 
-    // TODO: Make this transactional
-    // * Add @Transactional
     public FileUploadResponse uploadFile(String objectName) {
         var fileMetadataList = fileMetadataRepository.findByName(objectName);
         // TODO: Try to use MongoDB unique indexing to handle this
@@ -46,10 +44,10 @@ public class FileService {
             return FileUploadResponse.builder().errorMessage("File already exists").build();
         }
 
+        // Generating signed URL can potentially fail so we do it before saving to DB
+        var url = generateSignedUploadUrl(objectName);
         var newFileMetadata = FileMetadata.builder().name(objectName).status(FileMetadata.Status.UPLOADING).build();
         fileMetadataRepository.save(newFileMetadata);
-
-        var url = generateSignedUploadUrl(objectName);
         return FileUploadResponse.builder().uploadUrl(url).build();
     }
 
