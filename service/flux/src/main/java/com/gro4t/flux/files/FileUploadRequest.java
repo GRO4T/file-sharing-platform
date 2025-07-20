@@ -1,4 +1,4 @@
-package com.gro4t.flux.dto;
+package com.gro4t.flux.files;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

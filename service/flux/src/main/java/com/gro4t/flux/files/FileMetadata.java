@@ -1,6 +1,5 @@
-package com.gro4t.flux.model;
+package com.gro4t.flux.files;
 
-import com.gro4t.flux.FileStatus;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;

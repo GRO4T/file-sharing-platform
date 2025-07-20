@@ -1,9 +1,5 @@
-package com.gro4t.flux.controller;
+package com.gro4t.flux.files;
 
-import com.gro4t.flux.dto.FileDto;
-import com.gro4t.flux.dto.FileUploadRequest;
-import com.gro4t.flux.dto.FileUploadResponse;
-import com.gro4t.flux.service.FileService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

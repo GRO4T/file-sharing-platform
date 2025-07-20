@@ -1,15 +1,9 @@
-package com.gro4t.flux.service;
+package com.gro4t.flux.files;
 
 import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
-import com.gro4t.flux.FileStatus;
-import com.gro4t.flux.dto.FileDto;
-import com.gro4t.flux.dto.FileUploadResponse;
-import com.gro4t.flux.mapper.FileMapper;
-import com.gro4t.flux.model.FileMetadata;
-import com.gro4t.flux.repository.FileMetadataRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;

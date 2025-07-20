@@ -1,11 +1,11 @@
 package com.gro4t.flux;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gro4t.flux.controller.FileController;
-import com.gro4t.flux.dto.FileDto;
-import com.gro4t.flux.dto.FileUploadRequest;
-import com.gro4t.flux.dto.FileUploadResponse;
-import com.gro4t.flux.service.FileService;
+import com.gro4t.flux.files.FileController;
+import com.gro4t.flux.files.FileDto;
+import com.gro4t.flux.files.FileUploadRequest;
+import com.gro4t.flux.files.FileUploadResponse;
+import com.gro4t.flux.files.FileService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

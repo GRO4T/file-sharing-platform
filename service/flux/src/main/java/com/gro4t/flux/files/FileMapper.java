@@ -1,7 +1,5 @@
-package com.gro4t.flux.mapper;
+package com.gro4t.flux.files;
 
-import com.gro4t.flux.dto.FileDto;
-import com.gro4t.flux.model.FileMetadata;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

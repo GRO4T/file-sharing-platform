@@ -1,4 +1,4 @@
-package com.gro4t.flux;
+package com.gro4t.flux.files;
 
 public enum FileStatus {
     UPLOADING,
