@@ -8,13 +8,54 @@ import ListItemText from "@mui/material/ListItemText";
 import ImageIcon from "@mui/icons-material/Image";
 import Button from "@mui/material/Button";
 
+const API_URL: string = "http://localhost:8080"
+
 export default function App() {
   const fileInput = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<string[]>([]);
 
+  const addFile = async (file: File) => {
+    fetch(`${API_URL}/files`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ name: file.name }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("POST /files failed");
+        }
+        return response.json();
+      })
+      .then((data) => {
+        uploadFileContent(data.uploadUrl, file);
+      })
+      .catch((error) => console.error("Error uploading file: ", error));
+  };
+
+  const uploadFileContent = async (uploadUrl: string, file: File) => {
+    fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/octet-stream",
+      },
+      body: file,
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("PUT signed URL failed: " + response.status);
+        }
+        fetchFiles();
+      })
+      .catch((error) =>
+        console.error("Cloud Storage upload failed: ", error)
+      );
+  };
+
   const fetchFiles = async () => {
-    fetch("http://localhost:8080/files")
+    fetch(`${API_URL}/files`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("GET /files failed");
@@ -22,7 +63,7 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        const names = data.map((item) => item.name);
+        const names = data.map((item: File) => item.name);
         setFiles(names);
       })
       .catch((error) => console.error("Error fetching files: ", error));
@@ -40,39 +81,7 @@ export default function App() {
 
       const file = target.files[0];
 
-      fetch("http://localhost:8080/files", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name: file.name }),
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("POST /files failed");
-          }
-          return response.json();
-        })
-        .then((data) => {
-          console.log(data);
-          fetch(data.uploadUrl, {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/octet-stream",
-            },
-            body: file,
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error("PUT signed URL failed: " + response.status);
-              }
-              fetchFiles();
-            })
-            .catch((error) =>
-              console.error("Cloud Storage upload failed: ", error)
-            );
-        })
-        .catch((error) => console.error("Error uploading file: ", error));
+      addFile(file);
 
       target.value = "";
     });
