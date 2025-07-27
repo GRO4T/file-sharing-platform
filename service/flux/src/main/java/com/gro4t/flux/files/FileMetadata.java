@@ -2,11 +2,8 @@ package com.gro4t.flux.files;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
+import lombok.*;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Data
@@ -15,9 +12,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FileMetadata {
-    @Indexed(unique = true)
+    @Id
+    private String id;
+
     @NotBlank(message = "Name cannot be blank")
     private String name;
+
     @PositiveOrZero(message = "Size cannot be negative")
     private int size;
     // TODO: Create custom validator

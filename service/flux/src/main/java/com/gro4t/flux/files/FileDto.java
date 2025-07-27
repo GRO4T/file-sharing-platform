@@ -10,4 +10,5 @@ public class FileDto {
     private int size;
     private String type;
     private String uploadedBy;
+    private FileMetadata.Status status;
 }

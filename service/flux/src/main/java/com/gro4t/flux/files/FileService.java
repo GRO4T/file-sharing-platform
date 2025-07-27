@@ -5,6 +5,8 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
 import com.gro4t.flux.SystemConfiguration;
+import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
+import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,18 +39,42 @@ public class FileService {
         return fileMetadataRepository.findAll().stream().map(fileMapper::fileMetadataToFileDto).toList();
     }
 
-    public FileUploadResponse uploadFile(String objectName) {
-        var fileMetadataList = fileMetadataRepository.findByName(objectName);
+    /**
+     * Register a new file in the metadata database.
+     *
+     * @param name filename
+     * @return When successful returns signed URL used to upload the file to object storage. Otherwise, response contains
+     * error message.
+     */
+    public String addFile(String name) {
+        var fileMetadataList = fileMetadataRepository.findByName(name);
         // TODO: Try to use MongoDB unique indexing to handle this
         if (!fileMetadataList.isEmpty()) {
-            return FileUploadResponse.builder().errorMessage("File already exists").build();
+            throw new FluxFileAlreadyExistsException();
         }
 
         // Generating signed URL can potentially fail so we do it before saving to DB
-        var url = generateSignedUploadUrl(objectName);
-        var newFileMetadata = FileMetadata.builder().name(objectName).status(FileMetadata.Status.UPLOADING).build();
+        var url = generateSignedUploadUrl(name);
+        var newFileMetadata = FileMetadata.builder().name(name).status(FileMetadata.Status.UPLOADING).build();
         fileMetadataRepository.save(newFileMetadata);
-        return FileUploadResponse.builder().uploadUrl(url).build();
+        return url;
+    }
+
+    /**
+     * Register file being uploaded to object storage.
+     *
+     * @param id file ID
+     * @return file information
+     */
+    public FileDto registerFileUploaded(String id) {
+        var fileOpt = fileMetadataRepository.findById(id);
+        if (fileOpt.isEmpty()) {
+            throw new FluxFileNotFoundException();
+        }
+        var file = fileOpt.get();
+        file.setStatus(FileMetadata.Status.UPLOADED);
+        fileMetadataRepository.save(file);
+        return fileMapper.fileMetadataToFileDto(file);
     }
 
     String generateSignedUploadUrl(String objectName) {
