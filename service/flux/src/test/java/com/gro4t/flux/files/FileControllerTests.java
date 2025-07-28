@@ -1,7 +1,9 @@
-package com.gro4t.flux;
+package com.gro4t.flux.files;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gro4t.flux.files.*;
+import com.gro4t.flux.files.dto.FileDto;
+import com.gro4t.flux.files.dto.FileUploadRequest;
+import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -34,12 +36,13 @@ class FileControllerTests {
     @Test
     public void testGetFilesShouldAlwaysSucceed() throws Exception {
         when(service.getFiles())
-                .thenReturn(List.of(new FileDto("document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED)));
+                .thenReturn(List.of(new FileDto("123", "document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED.toString())));
 
         this.mockMvc.perform(get("/files"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].id", is("123")))
                 .andExpect(jsonPath("$[0].name", is("document.pdf")))
                 .andExpect(jsonPath("$[0].size", is(1024)))
                 .andExpect(jsonPath("$[0].type", is("application/pdf")))
@@ -53,12 +56,14 @@ class FileControllerTests {
         String requestSerialized = objectMapper.writeValueAsString(request);
         String mockUploadUrl = "https://google.cloud.storage.com/ABC123";
 
-        when(service.addFile("document.pdf")).thenReturn(mockUploadUrl);
+        when(service.addFile("document.pdf"))
+                .thenReturn(FileUploadResponse.builder().id("123").uploadUrl(mockUploadUrl).build());
 
         this.mockMvc.perform(post("/files")
                         .contentType("application/json")
                         .content(requestSerialized))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", is("123")))
                 .andExpect(jsonPath("$.uploadUrl", is(mockUploadUrl)));
     }
 
@@ -72,16 +77,15 @@ class FileControllerTests {
         this.mockMvc.perform(post("/files")
                         .contentType("application/json")
                         .content(requestSerialized))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorMessage", is("File already exists")));
+                .andExpect(status().isConflict());
     }
 
     @Test
-    public void testRegisterFileUploaded() throws Exception {
+    public void testNotifyFileUploaded() throws Exception {
         String fileId = "08321080fdsa";
 
-        when(service.registerFileUploaded(fileId))
-                .thenReturn(new FileDto("document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED));
+        when(service.notifyFileUploaded(fileId))
+                .thenReturn(new FileDto(fileId, "document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED.toString()));
 
         this.mockMvc.perform(post("/files/" + fileId + "/upload"))
                 .andExpect(status().isOk())
@@ -89,10 +93,10 @@ class FileControllerTests {
     }
 
     @Test
-    public void testRegisterFileUploadedWhenFileNotFound() throws Exception {
+    public void testNotifyFileUploadedWhenFileNotFound() throws Exception {
         String fileId = "08321080fdsa";
 
-        when(service.registerFileUploaded(fileId)).thenThrow(new FluxFileNotFoundException());
+        when(service.notifyFileUploaded(fileId)).thenThrow(new FluxFileNotFoundException());
 
         this.mockMvc.perform(post("/files/" + fileId + "/upload")).andExpect(status().isNotFound());
     }

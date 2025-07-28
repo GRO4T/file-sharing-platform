@@ -1,5 +1,8 @@
 package com.gro4t.flux.files;
 
+import com.gro4t.flux.files.dto.FileDto;
+import com.gro4t.flux.files.dto.FileUploadRequest;
+import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/files")
 @CrossOrigin(origins = "http://localhost:5173")
-public class FileController {
+class FileController {
     private final FileService fileService;
 
     @Autowired
@@ -28,26 +31,20 @@ public class FileController {
 
     @PostMapping
     public ResponseEntity<FileUploadResponse> addFile(@RequestBody FileUploadRequest fileUploadRequest) {
-        var status = HttpStatus.CREATED;
-        var body = FileUploadResponse.builder();
-
         try {
-            var uploadUrl = fileService.addFile(fileUploadRequest.getName());
-            body.uploadUrl(uploadUrl);
+            var response = fileService.addFile(fileUploadRequest.getName());
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(response);
         } catch (FluxFileAlreadyExistsException e) {
-            status = HttpStatus.BAD_REQUEST;
-            body.errorMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
-
-        return ResponseEntity
-                .status(status)
-                .body(body.build());
     }
 
     @PostMapping("/{id}/upload")
-    public ResponseEntity<FileDto> registerFileUploaded(@PathVariable("id") String fileId) {
+    public ResponseEntity<FileDto> notifyFileUploaded(@PathVariable("id") String fileId) {
         try {
-            var response = fileService.registerFileUploaded(fileId);
+            var response = fileService.notifyFileUploaded(fileId);
             return ResponseEntity.ok(response);
         } catch (FluxFileNotFoundException e) {
             return ResponseEntity.notFound().build();

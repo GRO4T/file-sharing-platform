@@ -2,7 +2,6 @@ package com.gro4t.flux;
 
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
-import com.gro4t.flux.files.FileMapperImpl;
 import com.gro4t.flux.files.FileMetadataRepository;
 import com.gro4t.flux.files.FileService;
 import lombok.Getter;
@@ -20,7 +19,7 @@ public class SystemConfiguration {
 
     @Bean
     public FileService fileService(FileMetadataRepository fileMetadataRepository, Storage blobStorage) {
-        return new FileService(fileMetadataRepository, new FileMapperImpl(), blobStorage, this);
+        return new FileService(fileMetadataRepository, blobStorage, this);
     }
 
     @Bean

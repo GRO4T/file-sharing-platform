@@ -1,10 +1,10 @@
-package com.gro4t.flux;
+package com.gro4t.flux.files;
 
 import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.Storage;
-import com.gro4t.flux.files.FileDto;
-import com.gro4t.flux.files.FileMetadata;
-import com.gro4t.flux.files.FileService;
+import com.gro4t.flux.ApplicationProperties;
+import com.gro4t.flux.SystemConfiguration;
+import com.gro4t.flux.files.dto.FileDto;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +51,8 @@ class FileServiceTests {
 
         // Then
         assertEquals(2, files.size());
-        assertTrue(files.contains(new FileDto("test_file.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED)));
-        assertTrue(files.contains(new FileDto("test_file2.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED)));
+        assertTrue(files.contains(new FileDto("1", "test_file.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED.toString())));
+        assertTrue(files.contains(new FileDto("2", "test_file2.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED.toString())));
     }
 
     @Test
@@ -72,10 +72,10 @@ class FileServiceTests {
         )).thenReturn(new URL(expectedSignedUrl));
 
         // When
-        var uploadUrl = fileService.addFile(fileName);
+        var response = fileService.addFile(fileName);
 
         // Then
-        assertEquals(expectedSignedUrl, uploadUrl);
+        assertEquals(expectedSignedUrl, response.getUploadUrl());
     }
 
     @Test
@@ -92,7 +92,7 @@ class FileServiceTests {
     }
 
     @Test
-    public void testRegisterFileUploaded() {
+    public void testNotifyFileUploaded() {
         // Given
         String fileId = "401280f8dsa08";
         String fileName = "document.pdf";
@@ -100,20 +100,20 @@ class FileServiceTests {
                 FileMetadata.Status.UPLOADING));
 
         // When
-        var response = fileService.registerFileUploaded(fileId);
+        var response = fileService.notifyFileUploaded(fileId);
 
         // Then
-        assertEquals(FileMetadata.Status.UPLOADED, response.getStatus());
+        assertEquals("UPLOADED", response.getStatus());
     }
 
     @Test
-    public void testRegisterFileUploadedWhenFileNotExist() {
+    public void testNotifyFileUploadedWhenFileNotExist() {
         // Given
         String fileId = "401280f8dsa08";
 
         // When and Then
         assertThrows(FluxFileNotFoundException.class, () -> {
-            fileService.registerFileUploaded(fileId);
+            fileService.notifyFileUploaded(fileId);
         });
     }
 }

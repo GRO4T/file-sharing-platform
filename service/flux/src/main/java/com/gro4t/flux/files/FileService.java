@@ -5,6 +5,8 @@ import com.google.cloud.storage.BlobInfo;
 import com.google.cloud.storage.HttpMethod;
 import com.google.cloud.storage.Storage;
 import com.gro4t.flux.SystemConfiguration;
+import com.gro4t.flux.files.dto.FileDto;
+import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +28,10 @@ public class FileService {
     @Autowired
     public FileService(
             FileMetadataRepository fileMetadataRepository,
-            FileMapper fileMapper,
             Storage blobStorage,
             SystemConfiguration systemConfiguration) {
         this.fileMetadataRepository = fileMetadataRepository;
-        this.fileMapper = fileMapper;
+        this.fileMapper = new FileMapperImpl();
         this.blobStorage = blobStorage;
         this.systemConfiguration = systemConfiguration;
     }
@@ -46,7 +47,7 @@ public class FileService {
      * @return When successful returns signed URL used to upload the file to object storage. Otherwise, response contains
      * error message.
      */
-    public String addFile(String name) {
+    public FileUploadResponse addFile(String name) {
         var fileMetadataList = fileMetadataRepository.findByName(name);
         // TODO: Try to use MongoDB unique indexing to handle this
         if (!fileMetadataList.isEmpty()) {
@@ -57,16 +58,19 @@ public class FileService {
         var url = generateSignedUploadUrl(name);
         var newFileMetadata = FileMetadata.builder().name(name).status(FileMetadata.Status.UPLOADING).build();
         fileMetadataRepository.save(newFileMetadata);
-        return url;
+
+        return FileUploadResponse.builder()
+                .id(newFileMetadata.getId())
+                .uploadUrl(url).build();
     }
 
     /**
-     * Register file being uploaded to object storage.
+     * Notify file has been uploaded to object storage.
      *
      * @param id file ID
      * @return file information
      */
-    public FileDto registerFileUploaded(String id) {
+    public FileDto notifyFileUploaded(String id) {
         var fileOpt = fileMetadataRepository.findById(id);
         if (fileOpt.isEmpty()) {
             throw new FluxFileNotFoundException();

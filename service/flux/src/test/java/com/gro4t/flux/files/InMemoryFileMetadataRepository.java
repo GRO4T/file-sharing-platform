@@ -1,7 +1,6 @@
-package com.gro4t.flux;
+package com.gro4t.flux.files;
 
-import com.gro4t.flux.files.FileMetadata;
-import com.gro4t.flux.files.FileMetadataRepository;
+import com.gro4t.flux.InMemoryRepository;
 
 import java.util.List;
 import java.util.Optional;

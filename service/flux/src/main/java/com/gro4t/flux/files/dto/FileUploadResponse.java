@@ -1,4 +1,4 @@
-package com.gro4t.flux.files;
+package com.gro4t.flux.files.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class FileUploadResponse {
+    private String id;
     private String uploadUrl;
-    private String errorMessage;
 }

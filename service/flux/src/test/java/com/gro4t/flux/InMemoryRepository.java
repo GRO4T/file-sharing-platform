@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
-class InMemoryRepository<T> implements MongoRepository<T, String> {
+public class InMemoryRepository<T> implements MongoRepository<T, String> {
     protected ConcurrentHashMap<String, T> map = new ConcurrentHashMap<>();
 
     @Override
