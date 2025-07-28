@@ -30,12 +30,12 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        uploadFileContent(data.uploadUrl, file);
+        uploadFileContent(data.id, data.uploadUrl, file);
       })
       .catch((error) => console.error("Error uploading file: ", error));
   };
 
-  const uploadFileContent = async (uploadUrl: string, file: File) => {
+  const uploadFileContent = async (fileId: string, uploadUrl: string, file: File) => {
     fetch(uploadUrl, {
       method: "PUT",
       headers: {
@@ -47,11 +47,19 @@ export default function App() {
         if (!response.ok) {
           throw new Error("PUT signed URL failed: " + response.status);
         }
+        notifyFileUploaded(fileId);
         fetchFiles();
       })
       .catch((error) =>
         console.error("Cloud Storage upload failed: ", error)
       );
+  };
+
+  const notifyFileUploaded = async (fileId: string) => {
+    fetch(`${API_URL}/files/${fileId}/upload`, {
+      method: "POST",
+    })
+      .catch((error) => console.error("Error notifying file uploaded: ", error));
   };
 
   const fetchFiles = async () => {
