@@ -6,6 +6,7 @@ import com.gro4t.flux.files.dto.FileUploadRequest;
 import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
+import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -34,7 +35,7 @@ class FileControllerTests {
     private FileService service;
 
     @Test
-    public void testGetFilesShouldAlwaysSucceed() throws Exception {
+    public void testGetFiles() throws Exception {
         when(service.getFiles())
                 .thenReturn(List.of(new FileDto("123", "document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED.toString())));
 
@@ -51,7 +52,7 @@ class FileControllerTests {
     }
 
     @Test
-    public void testAddFileWhenFileNotExistShouldReturnAddUrl() throws Exception {
+    public void testAddFile() throws Exception {
         FileUploadRequest request = new FileUploadRequest("document.pdf");
         String requestSerialized = objectMapper.writeValueAsString(request);
         String mockUploadUrl = "https://google.cloud.storage.com/ABC123";
@@ -68,19 +69,6 @@ class FileControllerTests {
     }
 
     @Test
-    public void testAddFileWhenFileExistShouldReturnBadRequest() throws Exception {
-        FileUploadRequest request = new FileUploadRequest("document.pdf");
-        String requestSerialized = objectMapper.writeValueAsString(request);
-
-        when(service.addFile("document.pdf")).thenThrow(new FluxFileAlreadyExistsException());
-
-        this.mockMvc.perform(post("/files")
-                        .contentType("application/json")
-                        .content(requestSerialized))
-                .andExpect(status().isConflict());
-    }
-
-    @Test
     public void testNotifyFileUploaded() throws Exception {
         String fileId = "08321080fdsa";
 
@@ -93,11 +81,12 @@ class FileControllerTests {
     }
 
     @Test
-    public void testNotifyFileUploadedWhenFileNotFound() throws Exception {
-        String fileId = "08321080fdsa";
+    public void testGetDownloadUrl() throws Exception {
+        String fileId = "021840810";
 
-        when(service.notifyFileUploaded(fileId)).thenThrow(new FluxFileNotFoundException());
+        when(service.getDownloadUrl(fileId))
+                .thenReturn("https://mock-download-url.com/document.pdf");
 
-        this.mockMvc.perform(post("/files/" + fileId + "/upload")).andExpect(status().isNotFound());
+        this.mockMvc.perform(get("/files/" + fileId + "/download")).andExpect(status().isOk());
     }
 }

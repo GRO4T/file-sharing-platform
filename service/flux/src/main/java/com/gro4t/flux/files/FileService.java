@@ -9,6 +9,7 @@ import com.gro4t.flux.files.dto.FileDto;
 import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
+import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,11 +68,11 @@ public class FileService {
     /**
      * Notify file has been uploaded to object storage.
      *
-     * @param id file ID
+     * @param fileId file ID
      * @return file information
      */
-    public FileDto notifyFileUploaded(String id) {
-        var fileOpt = fileMetadataRepository.findById(id);
+    public FileDto notifyFileUploaded(String fileId) {
+        var fileOpt = fileMetadataRepository.findById(fileId);
         if (fileOpt.isEmpty()) {
             throw new FluxFileNotFoundException();
         }
@@ -81,15 +82,40 @@ public class FileService {
         return fileMapper.fileMetadataToFileDto(file);
     }
 
+    /**
+     * Obtain the link to download the file from object storage.
+     *
+     * @param fileId file ID
+     * @return download URL
+     */
+    public String getDownloadUrl(String fileId) {
+        var fileOpt = fileMetadataRepository.findById(fileId);
+        if (fileOpt.isEmpty()) {
+            throw new FluxFileNotFoundException();
+        }
+        var file = fileOpt.get();
+        if (file.getStatus() == FileMetadata.Status.UPLOADING) {
+            throw new FluxFileNotUploadedException();
+        }
+        return generateSignedDownloadUrl(file.getName());
+    }
+
     String generateSignedUploadUrl(String objectName) {
-        BlobInfo blobInfo =
-                BlobInfo.newBuilder(BlobId.of(systemConfiguration.getApplicationProperties().getBucketName(),
-                        objectName)).build();
+        BlobInfo blobInfo = BlobInfo.newBuilder(
+                BlobId.of(systemConfiguration.getApplicationProperties().getBucketName(), objectName)).build();
         Map<String, String> extensionHeaders = new HashMap<>();
         extensionHeaders.put("Content-Type", "application/octet-stream");
         URL url = blobStorage.signUrl(blobInfo, 15, TimeUnit.MINUTES,
                 Storage.SignUrlOption.httpMethod(HttpMethod.PUT),
-                Storage.SignUrlOption.withExtHeaders(extensionHeaders), Storage.SignUrlOption.withV4Signature());
+                Storage.SignUrlOption.withExtHeaders(extensionHeaders),
+                Storage.SignUrlOption.withV4Signature());
+        return url.toString();
+    }
+
+    String generateSignedDownloadUrl(String objectName) {
+        BlobInfo blobInfo = BlobInfo.newBuilder(
+                BlobId.of(systemConfiguration.getApplicationProperties().getBucketName(), objectName)).build();
+        URL url = blobStorage.signUrl(blobInfo, 15, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
         return url.toString();
     }
 }

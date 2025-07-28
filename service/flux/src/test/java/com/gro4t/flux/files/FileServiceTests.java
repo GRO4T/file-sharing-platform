@@ -7,6 +7,7 @@ import com.gro4t.flux.SystemConfiguration;
 import com.gro4t.flux.files.dto.FileDto;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
+import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,8 +97,8 @@ class FileServiceTests {
         // Given
         String fileId = "401280f8dsa08";
         String fileName = "document.pdf";
-        fileMetadataRepository.save(new FileMetadata(fileId, fileName, 1024, "application/pdf", "user123",
-                FileMetadata.Status.UPLOADING));
+        fileMetadataRepository.save(
+                new FileMetadata(fileId, fileName, 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADING));
 
         // When
         var response = fileService.notifyFileUploaded(fileId);
@@ -114,6 +115,53 @@ class FileServiceTests {
         // When and Then
         assertThrows(FluxFileNotFoundException.class, () -> {
             fileService.notifyFileUploaded(fileId);
+        });
+    }
+
+    @Test
+    void testGetDownloadUrl() throws Exception {
+        // Given
+        String fileId = "80185083211";
+        String expectedDownloadUrl = "http://mocked-download-url.com/document.pdf";
+        fileMetadataRepository.save(
+                new FileMetadata(fileId, "document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED));
+
+        // Mock the behaviour of blobStorage.signUrl
+        when(blobStorage.signUrl(
+                any(BlobInfo.class),
+                any(Long.class),
+                any(TimeUnit.class),
+                any(Storage.SignUrlOption.class)  // For withV4Signature
+        )).thenReturn(new URL(expectedDownloadUrl));
+
+        // When
+        var downloadUrl = fileService.getDownloadUrl(fileId);
+
+        // Then
+        assertEquals(expectedDownloadUrl, downloadUrl);
+    }
+
+    @Test
+    void testGetDownloadUrlWhenFileNotExist() {
+        // Given
+        String fileId = "80185083211";
+
+        // When and Then
+        assertThrows(FluxFileNotFoundException.class, () -> {
+            fileService.getDownloadUrl(fileId);
+        });
+    }
+
+    @Test
+    void testGetDownloadUrlWhenFileNotUploaded() {
+        // Given
+        String fileId = "80185083211";
+        fileMetadataRepository.save(
+                new FileMetadata(fileId, "document.pdf", 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADING));
+
+        // When and Then
+        assertThrows(FluxFileNotUploadedException.class, () -> {
+            fileService.getDownloadUrl(fileId);
         });
     }
 }

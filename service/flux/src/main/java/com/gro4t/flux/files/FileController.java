@@ -5,6 +5,7 @@ import com.gro4t.flux.files.dto.FileUploadRequest;
 import com.gro4t.flux.files.dto.FileUploadResponse;
 import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
+import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +48,16 @@ class FileController {
             var response = fileService.notifyFileUploaded(fileId);
             return ResponseEntity.ok(response);
         } catch (FluxFileNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/{id}/download")
+    public ResponseEntity<String> getDownloadUrl(@PathVariable("id") String fileId) {
+        try {
+            var downloadUrl = fileService.getDownloadUrl(fileId);
+            return ResponseEntity.status(HttpStatus.OK).body(downloadUrl);
+        } catch (FluxFileNotFoundException | FluxFileNotUploadedException e) {
             return ResponseEntity.notFound().build();
         }
     }
