@@ -57,8 +57,10 @@ class FileController {
         try {
             var downloadUrl = fileService.getDownloadUrl(fileId);
             return ResponseEntity.status(HttpStatus.OK).body(downloadUrl);
-        } catch (FluxFileNotFoundException | FluxFileNotUploadedException e) {
+        } catch (FluxFileNotFoundException e) {
             return ResponseEntity.notFound().build();
+        } catch (FluxFileNotUploadedException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
     }
 }

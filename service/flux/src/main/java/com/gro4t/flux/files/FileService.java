@@ -115,7 +115,8 @@ public class FileService {
     String generateSignedDownloadUrl(String objectName) {
         BlobInfo blobInfo = BlobInfo.newBuilder(
                 BlobId.of(systemConfiguration.getApplicationProperties().getBucketName(), objectName)).build();
-        URL url = blobStorage.signUrl(blobInfo, 15, TimeUnit.MINUTES, Storage.SignUrlOption.withV4Signature());
+        URL url = blobStorage.signUrl(blobInfo, 15, TimeUnit.MINUTES,
+                Storage.SignUrlOption.withV4Signature());
         return url.toString();
     }
 }

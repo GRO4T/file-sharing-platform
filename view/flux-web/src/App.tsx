@@ -6,14 +6,25 @@ import ListItemAvatar from "@mui/material/ListItemAvatar";
 import Avatar from "@mui/material/Avatar";
 import ListItemText from "@mui/material/ListItemText";
 import ImageIcon from "@mui/icons-material/Image";
+import DownloadIcon from "@mui/icons-material/Download";
 import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
 
-const API_URL: string = "http://localhost:8080"
+const API_URL: string = "http://localhost:8080";
+
+interface FileDTO {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+  uploadedBy: string;
+  status: string;
+} 
 
 export default function App() {
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const [files, setFiles] = useState<string[]>([]);
+  const [files, setFiles] = useState<FileDTO[]>([]);
 
   const addFile = async (file: File) => {
     fetch(`${API_URL}/files`, {
@@ -35,7 +46,11 @@ export default function App() {
       .catch((error) => console.error("Error uploading file: ", error));
   };
 
-  const uploadFileContent = async (fileId: string, uploadUrl: string, file: File) => {
+  const uploadFileContent = async (
+    fileId: string,
+    uploadUrl: string,
+    file: File
+  ) => {
     fetch(uploadUrl, {
       method: "PUT",
       headers: {
@@ -50,16 +65,15 @@ export default function App() {
         notifyFileUploaded(fileId);
         fetchFiles();
       })
-      .catch((error) =>
-        console.error("Cloud Storage upload failed: ", error)
-      );
+      .catch((error) => console.error("Cloud Storage upload failed: ", error));
   };
 
   const notifyFileUploaded = async (fileId: string) => {
     fetch(`${API_URL}/files/${fileId}/upload`, {
       method: "POST",
-    })
-      .catch((error) => console.error("Error notifying file uploaded: ", error));
+    }).catch((error) =>
+      console.error("Error notifying file uploaded: ", error)
+    );
   };
 
   const fetchFiles = async () => {
@@ -71,11 +85,32 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        const names = data.map((item: File) => item.name);
-        setFiles(names);
+        setFiles(data);
       })
       .catch((error) => console.error("Error fetching files: ", error));
   };
+
+  const handleDownload = async (file: FileDTO) => {
+    fetch(`${API_URL}/files/${file.id}/download`)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to get file download URL")
+        }
+        return response.text();
+      })
+      .then((downloadUrl) => {
+        downloadFile(file.name, downloadUrl);
+      })
+      .catch((error) => console.error("Error getting file download URL: ", error));
+  };
+
+  const downloadFile = async (fileName: string, downloadUrl: string) => {
+      const a = document.createElement("a");
+      a.href = downloadUrl;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  }
 
   useEffect(() => {
     fetchFiles();
@@ -107,7 +142,7 @@ export default function App() {
       <List sx={{ width: "100%" }}>
         {files.map((file) => (
           <ListItem
-            key={file}
+            key={file.name}
             sx={{
               borderTop: "1px solid #e0e0e0",
               ":hover": { bgcolor: "grey.200" },
@@ -118,7 +153,10 @@ export default function App() {
                 <ImageIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={file} secondary="Jan 9, 2014" />
+            <ListItemText primary={file.name} secondary="Jan 9, 2014" />
+            <IconButton onClick={() => handleDownload(file)}>
+              <DownloadIcon/>
+            </IconButton>
           </ListItem>
         ))}
       </List>
