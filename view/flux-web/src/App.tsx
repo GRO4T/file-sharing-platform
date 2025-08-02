@@ -19,7 +19,7 @@ interface FileDTO {
   type: string;
   uploadedBy: string;
   status: string;
-} 
+}
 
 export default function App() {
   const fileInput = useRef<HTMLInputElement>(null);
@@ -49,7 +49,7 @@ export default function App() {
   const uploadFileContent = async (
     fileId: string,
     uploadUrl: string,
-    file: File
+    file: File,
   ) => {
     fetch(uploadUrl, {
       method: "PUT",
@@ -72,7 +72,7 @@ export default function App() {
     fetch(`${API_URL}/files/${fileId}/upload`, {
       method: "POST",
     }).catch((error) =>
-      console.error("Error notifying file uploaded: ", error)
+      console.error("Error notifying file uploaded: ", error),
     );
   };
 
@@ -94,23 +94,25 @@ export default function App() {
     fetch(`${API_URL}/files/${file.id}/download`)
       .then((response) => {
         if (!response.ok) {
-          throw new Error("Failed to get file download URL")
+          throw new Error("Failed to get file download URL");
         }
         return response.text();
       })
       .then((downloadUrl) => {
         downloadFile(file.name, downloadUrl);
       })
-      .catch((error) => console.error("Error getting file download URL: ", error));
+      .catch((error) =>
+        console.error("Error getting file download URL: ", error),
+      );
   };
 
   const downloadFile = async (fileName: string, downloadUrl: string) => {
-      const a = document.createElement("a");
-      a.href = downloadUrl;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-  }
+    const a = document.createElement("a");
+    a.href = downloadUrl;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   useEffect(() => {
     fetchFiles();
@@ -155,7 +157,7 @@ export default function App() {
             </ListItemAvatar>
             <ListItemText primary={file.name} secondary="Jan 9, 2014" />
             <IconButton onClick={() => handleDownload(file)}>
-              <DownloadIcon/>
+              <DownloadIcon />
             </IconButton>
           </ListItem>
         ))}

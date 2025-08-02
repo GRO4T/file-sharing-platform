@@ -9,7 +9,9 @@ mongo:
 
 fmt:
     cd service/flux && ./gradlew spotlessCheck
+    cd view/flux-web && npx prettier . --check
 
 fmt_fix:
     cd service/flux && ./gradlew spotlessApply
+    cd view/flux-web && npx prettier . --write
     
