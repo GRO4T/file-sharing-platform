@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class FluxApplication {
 
-    public static void main(String[] args) {
-        SpringApplication.run(FluxApplication.class, args);
-    }
-
+  public static void main(String[] args) {
+    SpringApplication.run(FluxApplication.class, args);
+  }
 }

@@ -7,8 +7,8 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 interface FileMapper {
-    FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
+  FileMapper INSTANCE = Mappers.getMapper(FileMapper.class);
 
-    @Mapping(source = "mimeType", target = "type")
-    FileDto fileMetadataToFileDto(FileMetadata fileMetadata);
+  @Mapping(source = "mimeType", target = "type")
+  FileDto fileMetadataToFileDto(FileMetadata fileMetadata);
 }

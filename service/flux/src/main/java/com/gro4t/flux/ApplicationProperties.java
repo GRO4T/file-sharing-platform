@@ -7,9 +7,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class ApplicationProperties {
-    @Value("${flux.blob_storage.project_id}")
-    private String projectId;
+  @Value("${flux.blob_storage.project_id}")
+  private String projectId;
 
-    @Value("${flux.blob_storage.bucket}")
-    private String bucketName;
+  @Value("${flux.blob_storage.bucket}")
+  private String bucketName;
 }

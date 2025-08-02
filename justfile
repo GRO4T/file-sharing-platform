@@ -6,3 +6,10 @@ docs:
 
 mongo:
     docker run --name flux-mongo -d -p 27017:27017 mongo:8.0.11-noble
+
+fmt:
+    cd service/flux && ./gradlew spotlessCheck
+
+fmt_fix:
+    cd service/flux && ./gradlew spotlessApply
+    
