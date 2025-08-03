@@ -13,6 +13,7 @@ import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.concurrent.TimeUnit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,7 @@ class FileServiceTests {
 
   private InMemoryFileMetadataRepository fileMetadataRepository;
   private FileService fileService;
+  private LocalDateTime localTime;
 
   @BeforeEach
   void setUp() {
@@ -35,6 +37,7 @@ class FileServiceTests {
     fileService =
         new SystemConfiguration(applicationProperties)
             .fileService(fileMetadataRepository, blobStorage);
+    localTime = LocalDateTime.now();
   }
 
   @Test
@@ -42,10 +45,22 @@ class FileServiceTests {
     // Given
     fileMetadataRepository.save(
         new FileMetadata(
-            "1", "test_file.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED));
+            "1",
+            "test_file.txt",
+            1024,
+            "text/plain",
+            "user123",
+            FileMetadata.Status.UPLOADED,
+            localTime));
     fileMetadataRepository.save(
         new FileMetadata(
-            "2", "test_file2.txt", 1024, "text/plain", "user123", FileMetadata.Status.UPLOADED));
+            "2",
+            "test_file2.txt",
+            1024,
+            "text/plain",
+            "user123",
+            FileMetadata.Status.UPLOADED,
+            localTime));
 
     // When
     var files = fileService.getFiles();
@@ -60,7 +75,8 @@ class FileServiceTests {
                 1024,
                 "text/plain",
                 "user123",
-                FileMetadata.Status.UPLOADED.toString())));
+                FileMetadata.Status.UPLOADED.toString(),
+                localTime)));
     assertTrue(
         files.contains(
             new FileDto(
@@ -69,7 +85,8 @@ class FileServiceTests {
                 1024,
                 "text/plain",
                 "user123",
-                FileMetadata.Status.UPLOADED.toString())));
+                FileMetadata.Status.UPLOADED.toString(),
+                localTime)));
   }
 
   @Test
@@ -102,7 +119,13 @@ class FileServiceTests {
     String fileName = "document.pdf";
     fileMetadataRepository.save(
         new FileMetadata(
-            "1", fileName, 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADED));
+            "1",
+            fileName,
+            1024,
+            "application/pdf",
+            "user123",
+            FileMetadata.Status.UPLOADED,
+            localTime));
 
     // When and Then
     assertThrows(
@@ -119,7 +142,13 @@ class FileServiceTests {
     String fileName = "document.pdf";
     fileMetadataRepository.save(
         new FileMetadata(
-            fileId, fileName, 1024, "application/pdf", "user123", FileMetadata.Status.UPLOADING));
+            fileId,
+            fileName,
+            1024,
+            "application/pdf",
+            "user123",
+            FileMetadata.Status.UPLOADING,
+            localTime));
 
     // When
     var response = fileService.notifyFileUploaded(fileId);
@@ -153,7 +182,8 @@ class FileServiceTests {
             1024,
             "application/pdf",
             "user123",
-            FileMetadata.Status.UPLOADED));
+            FileMetadata.Status.UPLOADED,
+            localTime));
 
     // Mock the behaviour of blobStorage.signUrl
     when(blobStorage.signUrl(
@@ -195,7 +225,8 @@ class FileServiceTests {
             1024,
             "application/pdf",
             "user123",
-            FileMetadata.Status.UPLOADING));
+            FileMetadata.Status.UPLOADING,
+            localTime));
 
     // When and Then
     assertThrows(

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gro4t.flux.files.dto.FileDto;
 import com.gro4t.flux.files.dto.FileUploadRequest;
 import com.gro4t.flux.files.dto.FileUploadResponse;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +39,8 @@ class FileControllerTests {
                     1024,
                     "application/pdf",
                     "user123",
-                    FileMetadata.Status.UPLOADED.toString())));
+                    FileMetadata.Status.UPLOADED.toString(),
+                    LocalDateTime.now())));
 
     this.mockMvc
         .perform(get("/files"))
@@ -81,7 +83,8 @@ class FileControllerTests {
                 1024,
                 "application/pdf",
                 "user123",
-                FileMetadata.Status.UPLOADED.toString()));
+                FileMetadata.Status.UPLOADED.toString(),
+                LocalDateTime.now()));
 
     this.mockMvc
         .perform(post("/files/" + fileId + "/upload"))

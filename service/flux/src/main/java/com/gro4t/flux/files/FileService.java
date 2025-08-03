@@ -11,6 +11,7 @@ import com.gro4t.flux.files.exception.FluxFileAlreadyExistsException;
 import com.gro4t.flux.files.exception.FluxFileNotFoundException;
 import com.gro4t.flux.files.exception.FluxFileNotUploadedException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +60,11 @@ public class FileService {
     // Generating signed URL can potentially fail so we do it before saving to DB
     var url = generateSignedUploadUrl(name);
     var newFileMetadata =
-        FileMetadata.builder().name(name).status(FileMetadata.Status.UPLOADING).build();
+        FileMetadata.builder()
+            .name(name)
+            .status(FileMetadata.Status.UPLOADING)
+            .createTime(LocalDateTime.now())
+            .build();
     fileMetadataRepository.save(newFileMetadata);
 
     return FileUploadResponse.builder().id(newFileMetadata.getId()).uploadUrl(url).build();

@@ -19,6 +19,7 @@ interface FileDTO {
   type: string;
   uploadedBy: string;
   status: string;
+  createTime: string;
 }
 
 export default function App() {
@@ -90,8 +91,8 @@ export default function App() {
       .catch((error) => console.error("Error fetching files: ", error));
   };
 
-  const handleDownload = async (file: FileDTO) => {
-    fetch(`${API_URL}/files/${file.id}/download`)
+  const handleDownload = async (fileId: string) => {
+    fetch(`${API_URL}/files/${fileId}/download`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to get file download URL");
@@ -99,19 +100,24 @@ export default function App() {
         return response.text();
       })
       .then((downloadUrl) => {
-        downloadFile(file.name, downloadUrl);
+        downloadFile(downloadUrl);
       })
       .catch((error) =>
         console.error("Error getting file download URL: ", error),
       );
   };
 
-  const downloadFile = async (fileName: string, downloadUrl: string) => {
+  const downloadFile = async (downloadUrl: string) => {
     const a = document.createElement("a");
     a.href = downloadUrl;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
+  };
+
+  const formatCreateTime = (createTime: string) => {
+    const createTimeDate = new Date(createTime);
+    return createTimeDate.toDateString();
   };
 
   useEffect(() => {
@@ -155,8 +161,11 @@ export default function App() {
                 <ImageIcon />
               </Avatar>
             </ListItemAvatar>
-            <ListItemText primary={file.name} secondary="Jan 9, 2014" />
-            <IconButton onClick={() => handleDownload(file)}>
+            <ListItemText
+              primary={file.name}
+              secondary={formatCreateTime(file.createTime)}
+            />
+            <IconButton onClick={() => handleDownload(file.id)}>
               <DownloadIcon />
             </IconButton>
           </ListItem>
