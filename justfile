@@ -7,6 +7,13 @@ docs:
 mongo:
     docker run --name flux-mongo -d -p 27017:27017 mongo:8.0.11-noble
 
+install:
+    pre-commit install
+    cd service/flux && ./gradlew spotlessInstallGitPrePushHook
+
+lint:
+    cd view/flux-web && npm run lint
+
 fmt:
     cd service/flux && ./gradlew spotlessCheck
     cd view/flux-web && npx prettier . --check
