@@ -44,7 +44,7 @@ workspace "Flux" "Flux file sharing platform" {
         u -> ss.wa "Views, uploads, downloads and shares files using"
 
         ss.wa -> ss.ag "Makes API calls to" "JSON/HTTPS"
-        ss.wa -> ss.db "Uploads, downloads files" 
+        ss.wa -> ss.db "Uploads, downloads files"
         ss.wa -> ss.cdn "Downloads frequently accessed files"
 
         ss.ag -> ss.as.file "Routes API calls to" "JSON/HTTPS"

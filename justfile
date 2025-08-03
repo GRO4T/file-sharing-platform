@@ -14,4 +14,3 @@ fmt:
 fmt_fix:
     cd service/flux && ./gradlew spotlessApply
     cd view/flux-web && npx prettier . --write
-    

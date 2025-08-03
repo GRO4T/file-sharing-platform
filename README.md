@@ -46,12 +46,12 @@ npm install
         * Storage Object Creator
         * Storage Object User
         * Storage Object Viewer
-    
+
     5. Export service account key to JSON
 
 4. Export the following environment variables:
     * `GOOGLE_APPLICATION_CREDENTIALS`: should point to the file with exported service account key
-    * `FLUX_BLOB_STORAGE_PROJECT_ID`: project ID the storage bucket sits in 
+    * `FLUX_BLOB_STORAGE_PROJECT_ID`: project ID the storage bucket sits in
     * `FLUX_BLOB_STORAGE_BUCKET`: name of the storage bucket
 
 ## Running the Application
