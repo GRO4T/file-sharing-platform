@@ -8,8 +8,7 @@ mongo:
     docker run --name flux-mongo -d -p 27017:27017 mongo:8.0.11-noble
 
 install:
-    pre-commit install
-    cd service/flux && ./gradlew spotlessInstallGitPrePushHook
+    pre-commit install --hook-type pre-commit --hook-type pre-push
 
 lint:
     cd view/flux-web && npm run lint
