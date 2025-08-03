@@ -9,6 +9,7 @@ mongo:
 
 install:
     pre-commit install --hook-type pre-commit --hook-type pre-push
+    cd view/flux-web && npm install
 
 lint:
     cd view/flux-web && npm run lint
@@ -20,3 +21,6 @@ fmt:
 fmt_fix:
     cd service/flux && ./gradlew spotlessApply
     cd view/flux-web && npx prettier . --write
+
+test:
+    cd service/flux && ./gradlew test

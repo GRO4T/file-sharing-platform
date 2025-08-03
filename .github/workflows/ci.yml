@@ -1,0 +1,34 @@
+name: Flux integration workflow
+
+on: push
+
+jobs:
+  validate-flux-web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./view/flux-web
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup
+        run: npm install
+
+      - name: Format
+        run: npx prettier . --check
+
+      - name: Lint
+        run: npm run lint
+
+  validate-flux-service:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: ./service/flux
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Format
+        run: ./gradlew spotlessCheck
