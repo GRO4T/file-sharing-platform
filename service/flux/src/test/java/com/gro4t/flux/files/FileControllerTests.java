@@ -41,7 +41,7 @@ class FileControllerTests {
                     FileMetadata.Status.UPLOADED.toString())));
 
     this.mockMvc
-        .perform(get("/files"))
+        .perform(get("/api/v1/files"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$").isArray())
         .andExpect(jsonPath("$", hasSize(1)))
@@ -63,7 +63,7 @@ class FileControllerTests {
         .thenReturn(FileUploadResponse.builder().id("123").uploadUrl(mockUploadUrl).build());
 
     this.mockMvc
-        .perform(post("/files").contentType("application/json").content(requestSerialized))
+        .perform(post("/api/v1/files").contentType("application/json").content(requestSerialized))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.id", is("123")))
         .andExpect(jsonPath("$.uploadUrl", is(mockUploadUrl)));
@@ -84,7 +84,7 @@ class FileControllerTests {
                 FileMetadata.Status.UPLOADED.toString()));
 
     this.mockMvc
-        .perform(post("/files/" + fileId + "/upload"))
+        .perform(post("/api/v1/files/" + fileId + "/upload"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.status", is("UPLOADED")));
   }
@@ -95,6 +95,6 @@ class FileControllerTests {
 
     when(service.getDownloadUrl(fileId)).thenReturn("https://mock-download-url.com/document.pdf");
 
-    this.mockMvc.perform(get("/files/" + fileId + "/download")).andExpect(status().isOk());
+    this.mockMvc.perform(get("/api/v1/files/" + fileId + "/download")).andExpect(status().isOk());
   }
 }

@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @Getter
 public class SystemConfiguration {
+  public static final String API_BASE_PATH = "/api/v1";
+
   private final ApplicationProperties applicationProperties;
 
   public SystemConfiguration(ApplicationProperties applicationProperties) {

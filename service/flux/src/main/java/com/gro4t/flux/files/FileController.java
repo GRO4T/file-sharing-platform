@@ -1,5 +1,6 @@
 package com.gro4t.flux.files;
 
+import com.gro4t.flux.SystemConfiguration;
 import com.gro4t.flux.files.dto.FileDto;
 import com.gro4t.flux.files.dto.FileUploadRequest;
 import com.gro4t.flux.files.dto.FileUploadResponse;
@@ -13,7 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/files")
+@RequestMapping(SystemConfiguration.API_BASE_PATH + "/files")
 @CrossOrigin(origins = "http://localhost:5173")
 class FileController {
   private final FileService fileService;

@@ -10,7 +10,7 @@ import DownloadIcon from "@mui/icons-material/Download";
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 
-const API_URL: string = "http://localhost:8080";
+const API_URL: string = "http://localhost:8080/api/v1";
 
 interface FileDTO {
   id: string;
