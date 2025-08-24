@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: flux
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/myrealm
+          jwk-set-uri: ${spring.security.oauth2.resourceserver.jwt.issuer-uri}/protocol/openid-connect/certs
+
+flux:
+  blob_storage:
+    project_id: ${FLUX_BLOB_STORAGE_PROJECT_ID}
+    bucket: ${FLUX_BLOB_STORAGE_BUCKET}

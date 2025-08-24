@@ -14,12 +14,20 @@ install:
 lint:
     cd view/flux-web && npm run lint
 
-fmt:
+fmt: _fmt_service _fmt_view
+
+_fmt_service:
     cd service/flux && ./gradlew spotlessCheck
+
+_fmt_view:
     cd view/flux-web && npx prettier . --check
 
-fmt_fix:
+fmt_fix: _fmt_service_fix _fmt_view_fix
+
+_fmt_service_fix:
     cd service/flux && ./gradlew spotlessApply
+
+_fmt_view_fix:
     cd view/flux-web && npx prettier . --write
 
 test:
